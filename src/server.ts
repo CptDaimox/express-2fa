@@ -1,12 +1,12 @@
 import { defaultErrorHandler, errorLogger, httpErrorHandler } from "@middlewares/errorHandler";
-import { userRouter } from "@/components/user";
+import { connectToMongoDB } from "@middlewares/mongoConnect";
 import cors from "cors";
-import dotenv from "dotenv";
 import express, { Express } from "express";
 import helmet from "helmet";
-import { connectToMongoDB } from "@middlewares/mongoConnect";
+import { config } from "./common/config";
+import { mainRouter } from "./routes";
 
-dotenv.config();
+if(!config) throw new Error("Environment variables are not defined");
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(connectToMongoDB);
 
 // Routes
-app.use("/users", userRouter);
+app.use("/", mainRouter);
 
 // Error Handlers
 app.use(errorLogger);
