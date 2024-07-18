@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
 import { createConnection } from "@common/mongodb";
+import { Request, Response } from "express";
 import { HttpException } from "./errorHandler";
 
 /**

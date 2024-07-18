@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 /**
  * Custom error class. Only addition is the code. This ensures that
@@ -77,4 +77,4 @@ function defaultErrorHandler(err: Error, _req: Request, res: Response, next: Nex
   next(err);
 }
 
-export { errorLogger, httpErrorHandler, defaultErrorHandler, HttpException };
+export { defaultErrorHandler, errorLogger, httpErrorHandler, HttpException };

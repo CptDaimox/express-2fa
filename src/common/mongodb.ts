@@ -9,7 +9,6 @@ let isConnected = false;
  * @returns On Success true, false otherwise.
  */
 async function createConnection() {
-  
   try {
     switch (connection.readyState) {
       case 1:
@@ -19,12 +18,12 @@ async function createConnection() {
         console.log("Not connected to database yet. Attempting to connect.");
         break;
     }
-  
+
     if (process.env.DATABASE_URL === undefined) return false;
     const dataBaseUrl = process.env.DATABASE_URL;
     // Attempt to connect to the database
     await connect(dataBaseUrl);
-  
+
     // Check the database connection state
     switch (connection.readyState) {
       case 0:

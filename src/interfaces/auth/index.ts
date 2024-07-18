@@ -1,1 +1,1 @@
-export * from './IAuthService';
+export * from "./IAuthService";

@@ -52,6 +52,11 @@ export class UserService implements IUserService {
     return user;
   }
 
+  /**
+   * Hashes a password using a salt value.
+   * @param password - The password to be hashed.
+   * @returns The hashed password.
+   */
   private hashPassword(password: string): string {
     return hash(password, config?.passwordSalt);
   }

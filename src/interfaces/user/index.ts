@@ -1,2 +1,2 @@
-export * from './IUserRepository';
-export * from './IUserService';
+export * from "./IUserRepository";
+export * from "./IUserService";

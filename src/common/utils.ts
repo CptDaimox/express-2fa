@@ -7,7 +7,9 @@ import { createHash } from "crypto";
  * @returns the hashed string
  */
 export function hash(string: string, salt?: string): string {
-  return createHash("sha512").update(string + salt).digest("hex");
+  return createHash("sha512")
+    .update(string + salt)
+    .digest("hex");
 }
 
 /**

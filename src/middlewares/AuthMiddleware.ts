@@ -2,14 +2,27 @@ import { extractBearerToken } from "@/common/utils";
 import { IAuthService } from "@/interfaces/auth/IAuthService";
 import { HttpException } from "./errorHandler";
 
+/**
+ * Middleware for authentication.
+ */
 export class AuthMiddleware {
   private authService: IAuthService;
 
+  /**
+   * Constructs an instance of AuthMiddleware.
+   * @param authService - The authentication service.
+   */
   constructor(authService: IAuthService) {
     this.authService = authService;
     this.authMiddleware = this.authMiddleware.bind(this);
   }
 
+  /**
+   * Middleware function that verifies the authentication token.
+   * @param req - The request object.
+   * @param res - The response object.
+   * @param next - The next middleware function.
+   */
   async authMiddleware(req: any, res: any, next: any) {
     try {
       const token = extractBearerToken(req.header("Authorization"));
@@ -22,7 +35,7 @@ export class AuthMiddleware {
       next();
     } catch (error) {
       console.error(error);
-      throw new HttpException('Invalid token', 401);
+      throw new HttpException("Invalid token", 401);
     }
   }
 }

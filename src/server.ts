@@ -6,7 +6,7 @@ import helmet from "helmet";
 import { config } from "./common/config";
 import { mainRouter } from "./routes";
 
-if(!config) throw new Error("Environment variables are not defined");
+if (!config) throw new Error("Environment variables are not defined");
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
