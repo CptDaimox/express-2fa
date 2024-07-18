@@ -1,8 +1,8 @@
 import { IUserService } from "@interfaces/user";
 import "express-async-errors";
 
+import { HttpException } from "@middlewares/errorHandler";
 import { NextFunction, Request, Response } from "express";
-import { HttpException } from "@/middlewares/errorHandler";
 
 export class UserController {
   private userService: IUserService;
@@ -28,7 +28,10 @@ export class UserController {
   async getUserByEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     const email = req.query.email as string;
     if (!email) return next();
-    res.status(200).json(await this.userService.findUserByEmail(email));
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) throw new HttpException("User not found", 404);
+
+    res.status(200).json({ _id: user._id, email: user.email, name: user.name, phone: user.phone });
   }
 
   async getAllUsers(req: Request, res: Response): Promise<void> {

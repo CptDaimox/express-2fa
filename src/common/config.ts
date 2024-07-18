@@ -4,7 +4,7 @@
 function checkEnv() {
   const passwordSalt = process.env.PASSWORD_SALT;
   const jwtSecret = process.env.JWT_SECRET;
-  if (!passwordSalt) {
+  if (!passwordSalt || !jwtSecret) {
     return null;
   }
 
