@@ -1,7 +1,7 @@
 import { twoFactorExpiration } from "@common/config";
 import { IAuthService } from "@interfaces/auth/IAuthService";
 import { ITwoFactorSmsService } from "@interfaces/twoFactorSms";
-import { IUserService } from "@interfaces/user";
+import { IUser, IUserService } from "@interfaces/user";
 import { HttpException } from "@middlewares/errorHandler";
 import crypto from "crypto";
 import { Request, Response } from "express";
@@ -28,6 +28,10 @@ export class AuthController {
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.verifyTwoFactorCode = this.verifyTwoFactorCode.bind(this);
+    this.requestPasswordChange = this.requestPasswordChange.bind(this);
+    this.changePassword = this.changePassword.bind(this);
+    this.setTwoFactorCode = this.setTwoFactorCode.bind(this);
+    this.sendTwoFactorCode = this.sendTwoFactorCode.bind(this);
   }
 
   /**
@@ -37,21 +41,14 @@ export class AuthController {
    */
   async login(req: Request, res: Response) {
     const { email, password } = req.body;
-    const user = await this.userService.findUserByCredentials(email, password);
 
+    const user = await this.userService.findUserByCredentials(email, password);
     if (!user) throw new HttpException("Invalid email or password", 401);
 
-    const code = crypto.randomInt(100000, 999999).toString();
+    const code = await this.setTwoFactorCode(user);
+    if (!code) throw new HttpException("Login failed", 500);
 
-    const updatedUser = await this.userService.updateUser(user._id, {
-      twoFactorCode: code,
-      twoFactorExpiry: new Date(Date.now() + twoFactorExpiration),
-    });
-
-    if (!updatedUser) throw new HttpException("Login failed", 500);
-
-    const isSent = await this.twoFactorSmsService.sendTwoFactorCode(user.phone, code);
-    if (!isSent) throw new HttpException("Failed sending two-factor authentication code", 500);
+    await this.sendTwoFactorCode(user.phone, code);
 
     res.status(200).json({ message: "Two-factor authentication code sent" });
   }
@@ -87,14 +84,59 @@ export class AuthController {
     if (user.twoFactorCode !== `${code}`) throw new HttpException("Invalid code", 401);
     if (user.twoFactorExpiry && user.twoFactorExpiry < new Date()) throw new HttpException("Code expired", 401);
 
-    const token = await this.authService.createToken(user.email);
+    const token = await this.authService.createToken(user._id);
     if (!token) throw new HttpException("Login failed", 500);
 
-    res.status(200).json({ token });
-
-    const updatedUser = await this.userService.updateUser(user._id, {
+    await this.userService.updateUser(user._id, {
       twoFactorCode: undefined,
       twoFactorExpiry: undefined,
     });
+
+    res.status(200).json({ token });
+  }
+
+  async requestPasswordChange(req: Request, res: Response) {
+    const userId = res.locals.decodedJWT.sub;
+
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new HttpException("User not found", 404);
+
+    const code = await this.setTwoFactorCode(user);
+    if (!code) throw new HttpException("Login failed", 500);
+
+    this.sendTwoFactorCode(user.phone, code);
+
+    res.status(200).json({ message: "Two-factor authentication code sent" });
+  }
+
+  async changePassword(req: Request, res: Response) {
+    const userId = res.locals.decodedJWT.sub;
+    const { password, code } = req.body;
+
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new HttpException("User not found", 404);
+    if (user.twoFactorCode !== `${code}`) throw new HttpException("Invalid code", 401);
+    if (user.twoFactorExpiry && user.twoFactorExpiry < new Date()) throw new HttpException("Code expired", 401);
+
+    const isPasswordChanged = await this.userService.changePassword(userId, password);
+    if (!isPasswordChanged) throw new HttpException("Login failed", 500);
+
+    res.status(200).json({ message: "Password changed" });
+  }
+
+  private async setTwoFactorCode(user: IUser): Promise<string | false> {
+    const code = crypto.randomInt(100000, 999999).toString();
+
+    const updatedUser = await this.userService.updateUser(user._id, {
+      twoFactorCode: code,
+      twoFactorExpiry: new Date(Date.now() + twoFactorExpiration),
+    });
+
+    return code;
+  }
+
+  private async sendTwoFactorCode(phone: string, twoFactorCode: string): Promise<void> {
+    const isSent = await this.twoFactorSmsService.sendTwoFactorCode(phone, twoFactorCode);
+    if (!isSent) throw new HttpException("Failed sending two-factor authentication code", 500);
   }
 }

@@ -8,7 +8,7 @@ export class AuthService implements IAuthService {
     this.verifyToken = this.verifyToken.bind(this);
   }
 
-  async createToken(userMail: string) {
+  async createToken(userId: string) {
     try {
       const secret = new TextEncoder().encode(config?.jwtSecret);
 
@@ -17,7 +17,7 @@ export class AuthService implements IAuthService {
         .setIssuedAt()
         .setIssuer(jwtConfig.iss)
         .setAudience(jwtConfig.aud)
-        .setSubject(userMail)
+        .setSubject(userId)
         .setExpirationTime(jwtConfig.exp)
         .sign(secret);
 

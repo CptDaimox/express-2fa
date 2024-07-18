@@ -22,5 +22,9 @@ const authMiddleware = new AuthMiddleware(authService);
 mainRouter.post("/login", authController.login);
 mainRouter.post("/register", authController.register);
 mainRouter.post("/verify", authController.verifyTwoFactorCode);
+
+// protected routes
 mainRouter.use(authMiddleware.authMiddleware);
+mainRouter.post("/request-password-change", authController.requestPasswordChange);
+mainRouter.post("/change-password", authController.changePassword);
 mainRouter.use("/users", userRouter);

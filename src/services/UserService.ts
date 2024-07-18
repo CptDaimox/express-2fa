@@ -16,12 +16,13 @@ export class UserService implements IUserService {
     this.findUserByCredentials = this.findUserByCredentials.bind(this);
   }
 
-  changePassword(userId: string, newPassword: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async changePassword(userId: string, newPassword: string): Promise<boolean> {
+    const updatedUser = await this.userRepository.updateUser(userId, { password: this.hashPassword(newPassword) });
+    return updatedUser ? true : false;
   }
 
-  updateUser(userId: string, updateFields: IUser): Promise<IUser | false> {
-    const updatedUser = this.userRepository.updateUser(userId, updateFields);
+  async updateUser(userId: string, updateFields: IUser): Promise<IUser | false> {
+    const updatedUser = await this.userRepository.updateUser(userId, updateFields);
     return updatedUser;
   }
 
@@ -30,8 +31,9 @@ export class UserService implements IUserService {
     return user;
   }
 
-  findUserById(userId: string): Promise<IUser | undefined> {
-    throw new Error("Method not implemented.");
+  async findUserById(userId: string): Promise<IUser | false> {
+    const user = await this.userRepository.findById(userId);
+    return user;
   }
 
   async findAllUsers(): Promise<IUser[] | false> {

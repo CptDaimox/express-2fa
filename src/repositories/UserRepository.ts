@@ -36,7 +36,7 @@ export class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<IUser | false> {
     try {
-      const user = await UserModel.findById(id, "email name phone");
+      const user = await UserModel.findById(id);
       if (!user) return false;
       return user;
     } catch (error) {

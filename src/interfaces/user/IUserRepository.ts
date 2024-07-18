@@ -8,7 +8,7 @@ export type IUser = {
   twoFactorExpiry?: Date;
 };
 
-export type IUserUpdate = Pick<Partial<IUser>, "name" | "email" | "twoFactorCode" | "twoFactorExpiry">;
+export type IUserUpdate = Pick<Partial<IUser>, "name" | "email" | "twoFactorCode" | "twoFactorExpiry" | "password">;
 
 /**
  * Represents a user repository.

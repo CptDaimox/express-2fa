@@ -30,9 +30,9 @@ export interface IUserService {
   /**
    * Finds a user by their ID.
    * @param userId - The ID of the user.
-   * @returns A promise that resolves to the user object, or `undefined` if the user was not found.
+   * @returns A promise that resolves to the user object, or false if the user was not found.
    */
-  findUserById(userId: string): Promise<IUser | undefined>;
+  findUserById(userId: string): Promise<IUser | false>;
 
   /**
    * Finds all users.

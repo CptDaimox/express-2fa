@@ -7,7 +7,7 @@ export interface IAuthService {
    * @param userMail The user email.
    * @returns A promise that resolves to the created token as a string, or `false` if the token creation fails.
    */
-  createToken: (userMail: string) => Promise<string | false>;
+  createToken: (userId: string) => Promise<string | false>;
 
   /**
    * Verifies the specified token.
