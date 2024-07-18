@@ -73,7 +73,15 @@ export class UserController {
    * @throws HttpException indicating that the method is not implemented.
    */
   async updateUser(req: Request, res: Response): Promise<void> {
-    throw new HttpException("Method not implemented", 501);
+    const userId = res.locals.decodedJWT.sub;
+    const { name, email } = req.body;
+    const user = await this.userService.findUserById(userId);
+    if (!user) throw new HttpException("User not found", 404);
+
+    const updatedUser = await this.userService.updateUser(userId, { name, email });
+    if (!updatedUser) throw new HttpException("User could not be updated", 500);
+    
+    res.status(200).json({ message: "User updated" });
   }
 
   /**

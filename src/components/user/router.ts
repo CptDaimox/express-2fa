@@ -6,7 +6,7 @@ export function getUserRouter(userController: UserController) {
 
   userRouter.get("/:id", userController.getUserById);
   userRouter.get("/", userController.getUserByEmail, userController.getAllUsers);
-  userRouter.put("/:id", userController.updateUser);
+  userRouter.put("/", userController.updateUser);
 
   return userRouter;
 }
